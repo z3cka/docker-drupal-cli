@@ -11,8 +11,8 @@ ENV LC_ALL en_US.UTF-8
 # Prevent services autoload (http://jpetazzo.github.io/2013/10/06/policy-rc-d-do-not-start-services-automatically/)
 RUN echo '#!/bin/sh\nexit 101' > /usr/sbin/policy-rc.d && chmod +x /usr/sbin/policy-rc.d
 
-# Adding https://launchpad.net/~ondrej/+archive/ubuntu/php5 PPA repo for php5.5
-RUN echo "deb http://ppa.launchpad.net/ondrej/php5/ubuntu precise main " >> /etc/apt/sources.list
+# Adding https://launchpad.net/~ondrej/+archive/ubuntu/php5 PPA repo for php5.6
+RUN echo "deb http://ppa.launchpad.net/ondrej/php5-5.6/ubuntu precise main " >> /etc/apt/sources.list
 
 RUN \
     # Update system
