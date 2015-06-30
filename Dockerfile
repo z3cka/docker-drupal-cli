@@ -18,7 +18,7 @@ RUN echo "deb http://ppa.launchpad.net/ondrej/php5-5.6/ubuntu precise main " >> 
 RUN \
     DEBIAN_FRONTEND=noninteractive apt-get update && \
     DEBIAN_FRONTEND=noninteractive apt-get -y --force-yes install \
-    supervisor curl wget zip git mysql-client pv \
+    supervisor curl wget zip git mysql-client pv apt-transport-https \
     --no-install-recommends && \
     # Cleanup
     DEBIAN_FRONTEND=noninteractive apt-get clean && \
@@ -35,11 +35,17 @@ RUN \
     DEBIAN_FRONTEND=noninteractive apt-get clean && \
     rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
 
+# Adding NodeJS repo (for up-to-date versions)
+# This command is a stripped down version of "curl --silent --location https://deb.nodesource.com/setup_0.12 | bash -"
+RUN curl -s https://deb.nodesource.com/gpgkey/nodesource.gpg.key | apt-key add - && \
+    echo 'deb https://deb.nodesource.com/node_0.12 precise main' > /etc/apt/sources.list.d/nodesource.list && \
+    echo 'deb-src https://deb.nodesource.com/node_0.12 precise main' >> /etc/apt/sources.list.d/nodesource.list
+
 # Other language packages and dependencies
 RUN \
     DEBIAN_FRONTEND=noninteractive apt-get update && \
     DEBIAN_FRONTEND=noninteractive apt-get -y --force-yes install \
-    ruby1.9.1-full rlwrap \
+    ruby1.9.1-full rlwrap nodejs \
     --no-install-recommends && \
     # Cleanup
     DEBIAN_FRONTEND=noninteractive apt-get clean && \
@@ -47,11 +53,6 @@ RUN \
 
 # Bundler
 RUN gem install bundler
-
-# Node JS 0.12.0
-RUN curl https://deb.nodesource.com/node012/pool/main/n/nodejs/nodejs_0.12.0-1nodesource1~wheezy1_amd64.deb > node.deb \
-    && dpkg -i node.deb \
-    && rm node.deb
 
 # Grunt, Bower
 RUN npm install -g grunt-cli bower
