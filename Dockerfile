@@ -14,16 +14,32 @@ RUN echo '#!/bin/sh\nexit 101' > /usr/sbin/policy-rc.d && chmod +x /usr/sbin/pol
 # Adding https://launchpad.net/~ondrej/+archive/ubuntu/php5 PPA repo for php5.6
 RUN echo "deb http://ppa.launchpad.net/ondrej/php5-5.6/ubuntu precise main " >> /etc/apt/sources.list
 
+# Basic packages
 RUN \
-    # Update system
     DEBIAN_FRONTEND=noninteractive apt-get update && \
-    # Install packages
-    DEBIAN_FRONTEND=noninteractive \
-    apt-get -y --force-yes install \
+    DEBIAN_FRONTEND=noninteractive apt-get -y --force-yes install \
+    supervisor curl wget zip git mysql-client pv \
+    --no-install-recommends && \
+    # Cleanup
+    DEBIAN_FRONTEND=noninteractive apt-get clean && \
+    rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
+
+# PHP packages
+RUN \
+    DEBIAN_FRONTEND=noninteractive apt-get update && \
+    DEBIAN_FRONTEND=noninteractive apt-get -y --force-yes install \
     php5-common php5-cli php-pear php5-mysql php5-imagick php5-mcrypt \
     php5-curl php5-gd php5-sqlite php5-json php5-memcache php5-intl \
-    pv curl wget zip git mysql-client ruby1.9.1-full rlwrap build-essential \
-    supervisor \
+    --no-install-recommends && \
+    # Cleanup
+    DEBIAN_FRONTEND=noninteractive apt-get clean && \
+    rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
+
+# Other language packages and dependencies
+RUN \
+    DEBIAN_FRONTEND=noninteractive apt-get update && \
+    DEBIAN_FRONTEND=noninteractive apt-get -y --force-yes install \
+    ruby1.9.1-full rlwrap \
     --no-install-recommends && \
     # Cleanup
     DEBIAN_FRONTEND=noninteractive apt-get clean && \
