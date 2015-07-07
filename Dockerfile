@@ -18,7 +18,7 @@ RUN echo "deb http://ppa.launchpad.net/ondrej/php5-5.6/ubuntu precise main " >> 
 RUN \
     DEBIAN_FRONTEND=noninteractive apt-get update && \
     DEBIAN_FRONTEND=noninteractive apt-get -y --force-yes install \
-    supervisor curl wget zip git mysql-client pv apt-transport-https \
+    supervisor curl wget zip git mysql-client pv apt-transport-https openssh-client rsync iputils-ping \
     --no-install-recommends && \
     # Cleanup
     DEBIAN_FRONTEND=noninteractive apt-get clean && \
