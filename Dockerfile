@@ -64,6 +64,9 @@ RUN composer global require drush/drush:7.* \
 # Add Composer bin directory to PATH
 ENV PATH /root/.composer/vendor/bin:$PATH
 
+# Drush modules
+RUN drush dl registry_rebuild
+
 ## PHP settings
 RUN \
     mkdir -p /var/www/docroot \
