@@ -87,6 +87,9 @@ COPY config/.drush /root/.drush
 COPY ./startup.sh /opt/startup.sh
 RUN chmod +x /opt/startup.sh
 
+# Default SSH key name
+ENV SSH_KEY_NAME id_rsa
+
 # Starter script
 ENTRYPOINT ["/opt/startup.sh"]
 
