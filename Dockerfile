@@ -25,6 +25,7 @@ RUN \
     openssh-client \
     rsync \
     iputils-ping \
+    mc \
     supervisor \
     # Cleanup
     && DEBIAN_FRONTEND=noninteractive apt-get clean \
