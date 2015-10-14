@@ -35,31 +35,79 @@ RUN dpkg-reconfigure locales && \
     /usr/sbin/update-locale LANG=C.UTF-8
 ENV LC_ALL C.UTF-8
 
-# Add Dotdeb PHP5.6 repo
-RUN curl -sSL http://www.dotdeb.org/dotdeb.gpg | apt-key add - && \
-    echo 'deb http://packages.dotdeb.org wheezy-php56 all' > /etc/apt/sources.list.d/dotdeb.list && \
-    echo 'deb-src http://packages.dotdeb.org wheezy-php56 all' >> /etc/apt/sources.list.d/dotdeb.list
+# Adding NodeJS repo (for up-to-date versions)
+# This command is a stripped down version of "curl --silent --location https://deb.nodesource.com/setup_0.12 | bash -"
+RUN curl -sSL https://deb.nodesource.com/gpgkey/nodesource.gpg.key | apt-key add - && \
+    echo 'deb https://deb.nodesource.com/node_0.12 wheezy main' > /etc/apt/sources.list.d/nodesource.list && \
+    echo 'deb-src https://deb.nodesource.com/node_0.12 wheezy main' >> /etc/apt/sources.list.d/nodesource.list
 
-# PHP packages
+# Other language packages and dependencies
 RUN DEBIAN_FRONTEND=noninteractive apt-get update && \
     DEBIAN_FRONTEND=noninteractive apt-get -y --force-yes --no-install-recommends install \
-    php5-common \
-    php5-cli \
-    php-pear \
-    php5-mysql \
-    php5-imagick \
-    php5-mcrypt \
-    php5-curl \
-    php5-gd \
-    php5-sqlite \
-    php5-json \
-    php5-intl \
-    php5-fpm \
-    php5-memcache \
-    php5-xdebug \
+    ruby1.9.1-full \
+    rlwrap \
+    make \
+    gcc \
+    nodejs \
     # Cleanup
-    && DEBIAN_FRONTEND=noninteractive apt-get clean && \
+    && DEBIAN_FRONTEND=noninteractive apt-get clean &&\
     rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
+
+# Bundler
+RUN gem install bundler
+
+# Home directory for bundle installs
+ENV BUNDLE_PATH .bundler
+
+# Grunt, Bower
+RUN npm install -g grunt-cli bower
+
+# Add Dotdeb PHP5.6 repo
+# RUN curl -sSL http://www.dotdeb.org/dotdeb.gpg | apt-key add - && \
+#     echo 'deb http://packages.dotdeb.org wheezy-php56 all' > /etc/apt/sources.list.d/dotdeb.list && \
+#     echo 'deb-src http://packages.dotdeb.org wheezy-php56 all' >> /etc/apt/sources.list.d/dotdeb.list
+
+# PHP packages
+RUN DEBIAN_FRONTEND=noninteractive apt-get update
+RUN DEBIAN_FRONTEND=noninteractive apt-get -y --force-yes --no-install-recommends install \
+    # php5-common \
+    # php5-cli \
+    # php-pear \
+    # php5-mysql \
+    # php5-imagick \
+    # php5-mcrypt \
+    # php5-curl \
+    # php5-gd \
+    # php5-sqlite \
+    # php5-json \
+    # php5-intl \
+    # php5-fpm \
+    # php5-memcache \
+    # php5-xdebug \
+    php5-cli php5-fpm libgmp10 libpng12-0 libjpeg8 libltdl7 libmcrypt4 libpq5 libicu48 libxslt1.1 libtidy-0.99
+    # Cleanup
+    # && DEBIAN_FRONTEND=noninteractive apt-get clean && \
+    # rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
+
+# PHP
+RUN \
+    # phpenv and php-build
+    curl -L https://raw.githubusercontent.com/CHH/phpenv/master/bin/phpenv-install.sh | bash && \
+    echo 'export PATH="/root/.phpenv/bin:$PATH"' >> /root/.bashrc && \
+    echo 'eval "$(phpenv init -)"' >> /root/.bashrc && \
+    git clone git://github.com/php-build/php-build.git /root/.phpenv/plugins/php-build
+
+ADD php-build-versions.tgz /root/.phpenv
+
+#ENV PATH /root/.phpenv/shims:root/.phpenv/bin:$PATH
+#ENV PHPENV_ROOT /root/.phpenv
+
+# RUN \
+#     php --version && \
+#     phpenv global 5.5.30 && \
+#     phpenv rehash && \
+#     phpenv versions && \
+#     php --version
 
 # Composer
 RUN curl -sSL https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer
@@ -103,33 +151,6 @@ RUN mkdir -p /var/www/docroot && \
     echo 'opcache.memory_consumption=128' >> /etc/php5/mods-available/opcache.ini
 
 COPY config/php5/xdebug.ini /etc/php5/mods-available/xdebug.ini
-
-# Adding NodeJS repo (for up-to-date versions)
-# This command is a stripped down version of "curl --silent --location https://deb.nodesource.com/setup_0.12 | bash -"
-RUN curl -sSL https://deb.nodesource.com/gpgkey/nodesource.gpg.key | apt-key add - && \
-    echo 'deb https://deb.nodesource.com/node_0.12 wheezy main' > /etc/apt/sources.list.d/nodesource.list && \
-    echo 'deb-src https://deb.nodesource.com/node_0.12 wheezy main' >> /etc/apt/sources.list.d/nodesource.list
-
-# Other language packages and dependencies
-RUN DEBIAN_FRONTEND=noninteractive apt-get update && \
-    DEBIAN_FRONTEND=noninteractive apt-get -y --force-yes --no-install-recommends install \
-    ruby1.9.1-full \
-    rlwrap \
-    make \
-    gcc \
-    nodejs \
-    # Cleanup
-    && DEBIAN_FRONTEND=noninteractive apt-get clean &&\
-    rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
-
-# Bundler
-RUN gem install bundler
-
-# Home directory for bundle installs
-ENV BUNDLE_PATH .bundler
-
-# Grunt, Bower
-RUN npm install -g grunt-cli bower
 
 WORKDIR /var/www
 
