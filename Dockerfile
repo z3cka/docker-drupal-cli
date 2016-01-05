@@ -141,6 +141,10 @@ COPY startup.sh /opt/startup.sh
 # Fix permissions after COPY
 RUN sudo chown -R docker:users /home/docker
 
+# Install mhsendmail - MailHog sendmail replacement
+# RUN sudo curl -L https://github.com/mailhog/mhsendmail/releases/download/v0.1.9/mhsendmail_linux_amd64 -o /usr/local/bin/mhsendmail && \
+#     sudo chmod +x /usr/local/bin/mhsendmail
+
 EXPOSE 9000
 
 WORKDIR /var/www
