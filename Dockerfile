@@ -101,6 +101,7 @@ RUN DEBIAN_FRONTEND=noninteractive apt-get update && \
     ruby-full \
     rlwrap \
     build-essential \
+    socat \
     # Cleanup
     && DEBIAN_FRONTEND=noninteractive apt-get clean &&\
     rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
@@ -173,6 +174,9 @@ WORKDIR /var/www
 
 # Default SSH key name
 ENV SSH_KEY_NAME id_rsa
+
+# Default SSH key name
+ENV SSH_AUTH_SOCK /home/docker/.ssh/docker
 
 # Starter script
 ENTRYPOINT ["/opt/startup.sh"]

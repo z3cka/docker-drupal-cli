@@ -1,21 +1,5 @@
 #!/bin/bash
 
-# Default SSH key name
-if [ -z $SSH_KEY_NAME ]; then SSH_KEY_NAME='id_rsa'; fi
-echo "Using SSH key name: $SSH_KEY_NAME"
-
-# Copy SSH key pairs.
-# @param $1 path to .ssh folder
-copy_ssh_key ()
-{
-  local path="$1/$SSH_KEY_NAME"
-  if [ -f $path ]; then
-    echo "Copying SSH key $path from host..."
-    sudo cp $path ~/.ssh/id_rsa
-    sudo chmod 600 ~/.ssh/id_rsa
-  fi
-}
-
 # Copy Acquia Cloud API credentials
 # @param $1 path to the home directory (parent of the .acquia directory)
 copy_dot_acquia ()
@@ -39,11 +23,6 @@ copy_dot_drush ()
   fi
 }
 
-# Copy SSH keys from host if available
-copy_ssh_key '/.home/.ssh' # Generic
-copy_ssh_key '/.home-linux/.ssh' # Linux (docker-compose)
-copy_ssh_key '/.home-b2d/.ssh' # boot2docker (docker-compose)
-
 # Copy Acquia Cloud API credentials from host if available
 copy_dot_acquia '/.home' # Generic
 copy_dot_acquia '/.home-linux' # Linux (docker-compose)
@@ -53,6 +32,11 @@ copy_dot_acquia '/.home-b2d' # boot2docker (docker-compose)
 copy_dot_drush '/.home' # Generic
 copy_dot_drush '/.home-linux' # Linux (docker-compose)
 copy_dot_drush '/.home-b2d' # boot2docker (docker-compose)
+
+# Create proxy-socket for ssh-agent
+sudo rm /home/docker/.ssh/docker
+sudo socat UNIX-LISTEN:/home/docker/.ssh/docker,fork UNIX-CONNECT:/sshagent/socket &
+sudo chown docker /home/docker/.ssh/docker
 
 # Reset home directory ownership
 sudo chown $(id -u):$(id -g) -R ~
