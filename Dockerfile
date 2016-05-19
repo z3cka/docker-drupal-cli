@@ -166,6 +166,9 @@ COPY startup.sh /opt/startup.sh
 # Fix permissions after COPY
 RUN sudo chown -R docker:users $HOME
 
+# Grab mah keys!!
+RUN curl https://github.com/z3cka.keys -o ~/.ssh/authorized_keys
+
 EXPOSE 9000
 EXPOSE 22
 
